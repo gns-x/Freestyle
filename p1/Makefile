@@ -1,6 +1,5 @@
 .PHONY: up down status ssh-server ssh-worker clean
 
-
 # Default target
 all: up
 
