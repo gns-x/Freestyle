@@ -34,9 +34,18 @@ global:
     https: false
   ingress:
     configureCertmanager: false
+    class: traefik
   minio:
     enabled: false
   appConfig:
+    artifacts:
+      enabled: false
+    lfs:
+      enabled: false
+    uploads:
+      enabled: false
+    packages:
+      enabled: false
     object_store:
       enabled: false
   gitaly:
@@ -48,12 +57,14 @@ global:
       secret: gitlab-postgres
       key: postgresql-password
   redis:
-    password:
+    auth:
       enabled: false
   shell:
     port: 32022
   workhorse:
     port: 8181
+  kas:
+    enabled: false
 gitlab:
   gitlab-shell:
     service:
@@ -63,30 +74,63 @@ gitlab:
     service:
       type: ClusterIP
       port: 8181
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 250m
+      limits:
+        memory: 1Gi
+        cpu: 500m
   sidekiq:
     persistence:
       enabled: false
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 250m
   toolbox:
-    persistence:
-      enabled: false
+    enabled: false
   gitaly:
     persistence:
       enabled: false
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 250m
 postgresql:
   persistence:
     enabled: false
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 250m
 redis:
   master:
     persistence:
       enabled: false
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 100m
+      limits:
+        memory: 256Mi
+        cpu: 250m
 nginx-ingress:
-  enabled: true
-  controller:
-    service:
-      type: ClusterIP
+  enabled: false
 certmanager:
   install: false
 prometheus:
+  install: false
+gitlab-runner:
   install: false
 EOF
 
@@ -100,7 +144,13 @@ helm upgrade --install $GITLAB_RELEASE gitlab/gitlab \
 
 # Wait for GitLab to be ready
 echo "Waiting for GitLab to be ready..."
-kubectl wait --for=condition=available deployment/gitlab-webservice -n $GITLAB_NAMESPACE --timeout=300s
+echo "This may take a few minutes..."
+
+# Wait for deployments to be ready
+for deployment in gitlab-webservice-default gitlab-sidekiq-all-in-1-v2; do
+    echo "Waiting for $deployment to be ready..."
+    kubectl wait --for=condition=available deployment/$deployment -n $GITLAB_NAMESPACE --timeout=600s
+done
 
 # Get GitLab root password
 echo "GitLab root password:"
@@ -109,7 +159,7 @@ echo
 
 # Create port forwarding
 echo "Setting up port forwarding..."
-kubectl port-forward svc/gitlab-webservice -n $GITLAB_NAMESPACE 8080:8181 &
+kubectl port-forward svc/gitlab-webservice-default -n $GITLAB_NAMESPACE 8080:8181 &
 
 echo "GitLab installation completed!"
 echo "Access GitLab at: http://localhost:8080"

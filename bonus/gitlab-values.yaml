@@ -1,0 +1,104 @@
+global:
+  hosts:
+    domain: localhost
+    https: false
+  ingress:
+    configureCertmanager: false
+    class: traefik
+  minio:
+    enabled: false
+  appConfig:
+    artifacts:
+      enabled: false
+    lfs:
+      enabled: false
+    uploads:
+      enabled: false
+    packages:
+      enabled: false
+    object_store:
+      enabled: false
+  gitaly:
+    persistence:
+      enabled: false
+  psql:
+    host: postgresql
+    password:
+      secret: gitlab-postgres
+      key: postgresql-password
+  redis:
+    auth:
+      enabled: false
+  shell:
+    port: 32022
+  workhorse:
+    port: 8181
+  kas:
+    enabled: false
+gitlab:
+  gitlab-shell:
+    service:
+      type: ClusterIP
+      port: 32022
+  webservice:
+    service:
+      type: ClusterIP
+      port: 8181
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 250m
+      limits:
+        memory: 1Gi
+        cpu: 500m
+  sidekiq:
+    persistence:
+      enabled: false
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 250m
+  toolbox:
+    enabled: false
+  gitaly:
+    persistence:
+      enabled: false
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 250m
+postgresql:
+  persistence:
+    enabled: false
+  resources:
+    requests:
+      memory: 256Mi
+      cpu: 100m
+    limits:
+      memory: 512Mi
+      cpu: 250m
+redis:
+  master:
+    persistence:
+      enabled: false
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 100m
+      limits:
+        memory: 256Mi
+        cpu: 250m
+nginx-ingress:
+  enabled: false
+certmanager:
+  install: false
+prometheus:
+  install: false
+gitlab-runner:
+  install: false

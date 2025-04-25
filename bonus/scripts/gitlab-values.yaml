@@ -1,0 +1,60 @@
+global:
+  hosts:
+    domain: localhost
+    https: false
+  ingress:
+    configureCertmanager: false
+  minio:
+    enabled: false
+  appConfig:
+    object_store:
+      enabled: false
+  gitaly:
+    persistence:
+      enabled: false
+  psql:
+    host: postgresql
+    password:
+      secret: gitlab-postgres
+      key: postgresql-password
+  redis:
+    password:
+      enabled: false
+  shell:
+    port: 32022
+  workhorse:
+    port: 8181
+gitlab:
+  gitlab-shell:
+    service:
+      type: ClusterIP
+      port: 32022
+  webservice:
+    service:
+      type: ClusterIP
+      port: 8181
+  sidekiq:
+    persistence:
+      enabled: false
+  toolbox:
+    persistence:
+      enabled: false
+  gitaly:
+    persistence:
+      enabled: false
+postgresql:
+  persistence:
+    enabled: false
+redis:
+  master:
+    persistence:
+      enabled: false
+nginx-ingress:
+  enabled: true
+  controller:
+    service:
+      type: ClusterIP
+certmanager:
+  install: false
+prometheus:
+  install: false
