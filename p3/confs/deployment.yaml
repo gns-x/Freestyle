@@ -45,10 +45,11 @@ kind: Ingress
 metadata:
   name: playground
   namespace: dev
+  annotations:
+    kubernetes.io/ingress.class: traefik
 spec:
   rules:
-  - host: localhost
-    http:
+  - http:
       paths:
       - path: /
         pathType: Prefix
