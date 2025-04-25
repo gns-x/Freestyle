@@ -1,0 +1,425 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app3
+  labels:
+    app: app3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app3
+  template:
+    metadata:
+      labels:
+        app: app3
+    spec:
+      containers:
+      - name: app3
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: app3-content
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: app3-content
+        configMap:
+          name: app3-content
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app3
+spec:
+  selector:
+    app: app3
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app3-content
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Lhackeuuuur | 1337 Coding School</title>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+          --primary-color: #3b82f6;
+          --secondary-color: #1d4ed8;
+          --accent-color: #f59e0b;
+          --background-color: #0f172a;
+          --card-color: #1e293b;
+          --text-color: #e2e8f0;
+          --success-color: #10b981;
+        }
+        
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        
+        body {
+          font-family: 'Space Grotesk', sans-serif;
+          background-color: var(--background-color);
+          color: var(--text-color);
+          line-height: 1.6;
+          overflow-x: hidden;
+        }
+        
+        .landing {
+          min-height: 100vh;
+          position: relative;
+        }
+        
+        .landing::before {
+          content: '';
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: 
+            radial-gradient(circle at 20% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+          pointer-events: none;
+          z-index: 0;
+        }
+        
+        .hero {
+          position: relative;
+          padding: 8rem 2rem;
+          text-align: center;
+          background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+          color: white;
+          overflow: hidden;
+        }
+        
+        .hero::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/></svg>') repeat;
+          opacity: 0.1;
+        }
+        
+        .hero h1 {
+          font-size: 4.5rem;
+          margin-bottom: 1rem;
+          position: relative;
+          animation: fadeInUp 1s ease;
+        }
+        
+        .hero h2 {
+          font-size: 2.5rem;
+          margin-bottom: 1.5rem;
+          position: relative;
+          animation: fadeInUp 1s ease 0.2s backwards;
+          background: linear-gradient(135deg, #ffffff, #e2e8f0);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+          font-size: 1.5rem;
+          max-width: 700px;
+          margin: 0 auto 2rem;
+          position: relative;
+          animation: fadeInUp 1s ease 0.4s backwards;
+          opacity: 0.9;
+        }
+        
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 1.5rem;
+          margin: 2rem auto;
+          max-width: 800px;
+        }
+        
+        .stat-item {
+          background: rgba(255, 255, 255, 0.1);
+          padding: 1.5rem;
+          border-radius: 1rem;
+          text-align: center;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-value {
+          font-size: 2.5rem;
+          font-weight: 700;
+          color: var(--accent-color);
+          margin-bottom: 0.5rem;
+        }
+        
+        .cta-buttons {
+          display: flex;
+          gap: 1rem;
+          justify-content: center;
+          margin-top: 2rem;
+        }
+        
+        .cta-button {
+          display: inline-block;
+          padding: 1rem 2rem;
+          border-radius: 0.5rem;
+          font-weight: 500;
+          text-decoration: none;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .cta-button.primary {
+          background-color: var(--accent-color);
+          color: white;
+        }
+        
+        .cta-button.secondary {
+          background-color: transparent;
+          color: white;
+          border: 2px solid white;
+        }
+        
+        .cta-button::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+          transform: translateX(-100%);
+          animation: shimmer 2s infinite;
+        }
+        
+        .cta-button:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .project-showcase {
+          padding: 6rem 2rem;
+          max-width: 1200px;
+          margin: 0 auto;
+          position: relative;
+          z-index: 1;
+        }
+        
+        .project-card {
+          background: var(--card-color);
+          padding: 2.5rem;
+          border-radius: 1rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          margin-bottom: 2rem;
+        }
+        
+        .project-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 12px -1px rgba(0, 0, 0, 0.2);
+        }
+        
+        .project-header {
+          display: flex;
+          align-items: center;
+          margin-bottom: 2rem;
+        }
+        
+        .project-icon {
+          width: 64px;
+          height: 64px;
+          background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+          border-radius: 1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 1.5rem;
+          font-size: 2rem;
+          color: white;
+        }
+        
+        .project-title {
+          font-size: 2rem;
+          color: var(--text-color);
+        }
+        
+        .project-description {
+          color: var(--text-color);
+          opacity: 0.8;
+          margin-bottom: 1.5rem;
+        }
+        
+        .tech-stack {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-top: 1rem;
+        }
+        
+        .tech-tag {
+          background: rgba(59, 130, 246, 0.1);
+          padding: 0.5rem 1rem;
+          border-radius: 2rem;
+          font-size: 0.875rem;
+          color: var(--primary-color);
+          border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .achievements {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 1.5rem;
+          margin-top: 2rem;
+        }
+        
+        .achievement-card {
+          background: var(--card-color);
+          padding: 1.5rem;
+          border-radius: 1rem;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .achievement-title {
+          color: var(--accent-color);
+          margin-bottom: 0.5rem;
+        }
+        
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        
+        .floating-particles {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 0;
+        }
+        
+        .particle {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          background: var(--primary-color);
+          border-radius: 50%;
+          opacity: 0.3;
+          animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+          0% { transform: translateY(0) translateX(0); opacity: 0; }
+          50% { transform: translateY(-100px) translateX(50px); opacity: 0.5; }
+          100% { transform: translateY(-200px) translateX(0); opacity: 0; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="landing">
+        <div class="floating-particles">
+          <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+          <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
+          <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
+          <div class="particle" style="left: 40%; animation-delay: 6s;"></div>
+          <div class="particle" style="left: 50%; animation-delay: 8s;"></div>
+          <div class="particle" style="left: 60%; animation-delay: 10s;"></div>
+          <div class="particle" style="left: 70%; animation-delay: 12s;"></div>
+          <div class="particle" style="left: 80%; animation-delay: 14s;"></div>
+          <div class="particle" style="left: 90%; animation-delay: 16s;"></div>
+        </div>
+        
+        <section class="hero">
+          <h1>Lhackeuuuur</h1>
+          <h2>1337 Coding School</h2>
+          <p>Cloud Infrastructure & DevOps Engineer | Kubernetes Specialist</p>
+          
+          <div class="stats-grid">
+            <div class="stat-item">
+              <div class="stat-value">100%</div>
+              <div class="stat-label">Project Completion</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">3+</div>
+              <div class="stat-label">Years Experience</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value">50+</div>
+              <div class="stat-label">Projects</div>
+            </div>
+          </div>
+          
+          <div class="cta-buttons">
+            <a href="#" class="cta-button primary">View Projects</a>
+            <a href="#" class="cta-button secondary">Contact Me</a>
+          </div>
+        </section>
+        
+        <section class="project-showcase">
+          <div class="project-card">
+            <div class="project-header">
+              <div class="project-icon">🚀</div>
+              <h3 class="project-title">Inception of Things (IoT)</h3>
+            </div>
+            <p class="project-description">
+              A comprehensive cloud infrastructure project implementing Kubernetes clusters with K3s,
+              featuring automated deployment, monitoring, and scaling capabilities. This project
+              demonstrates advanced DevOps practices and cloud-native architecture.
+            </p>
+            <div class="tech-stack">
+              <span class="tech-tag">Kubernetes</span>
+              <span class="tech-tag">K3s</span>
+              <span class="tech-tag">Docker</span>
+              <span class="tech-tag">Vagrant</span>
+              <span class="tech-tag">Helm</span>
+              <span class="tech-tag">Nginx</span>
+            </div>
+            
+            <div class="achievements">
+              <div class="achievement-card">
+                <h4 class="achievement-title">Infrastructure Automation</h4>
+                <p>Implemented automated provisioning and configuration of K3s clusters using Vagrant and shell scripts</p>
+              </div>
+              <div class="achievement-card">
+                <h4 class="achievement-title">High Availability</h4>
+                <p>Designed and deployed a highly available Kubernetes cluster with multiple worker nodes</p>
+              </div>
+              <div class="achievement-card">
+                <h4 class="achievement-title">Monitoring & Logging</h4>
+                <p>Integrated comprehensive monitoring and logging solutions for cluster observability</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </body>
+    </html> 

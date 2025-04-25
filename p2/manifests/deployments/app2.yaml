@@ -1,0 +1,397 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app2
+  labels:
+    app: app2
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app2
+  template:
+    metadata:
+      labels:
+        app: app2
+    spec:
+      containers:
+      - name: app2
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: app2-content
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: app2-content
+        configMap:
+          name: app2-content
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app2
+spec:
+  selector:
+    app: app2
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app2-content
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Lhackeuuuur | Portfolio</title>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+          --primary-color: #8b5cf6;
+          --secondary-color: #6d28d9;
+          --accent-color: #f59e0b;
+          --background-color: #0f172a;
+          --card-color: #1e293b;
+          --text-color: #e2e8f0;
+        }
+        
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        
+        body {
+          font-family: 'Space Grotesk', sans-serif;
+          background-color: var(--background-color);
+          color: var(--text-color);
+          line-height: 1.6;
+          overflow-x: hidden;
+        }
+        
+        .portfolio {
+          min-height: 100vh;
+          padding: 2rem;
+          position: relative;
+        }
+        
+        .portfolio::before {
+          content: '';
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: 
+            radial-gradient(circle at 20% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+          pointer-events: none;
+          z-index: 0;
+        }
+        
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 2rem;
+          padding: 1.5rem;
+          background: var(--card-color);
+          border-radius: 1rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          position: relative;
+          z-index: 1;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header h1 {
+          font-size: 2rem;
+          background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: gradientShift 5s ease infinite;
+        }
+        
+        .school-badge {
+          background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+          padding: 0.5rem 1rem;
+          border-radius: 2rem;
+          font-size: 0.875rem;
+          color: white;
+        }
+        
+        .hero {
+          text-align: center;
+          padding: 6rem 2rem;
+          background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+          color: white;
+          border-radius: 1rem;
+          margin-bottom: 4rem;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .hero::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="white" stroke-width="0.5" opacity="0.1"/></svg>') repeat;
+          opacity: 0.1;
+        }
+        
+        .hero h1 {
+          font-size: 4rem;
+          margin-bottom: 1rem;
+          position: relative;
+          animation: fadeInUp 1s ease;
+        }
+        
+        .hero p {
+          font-size: 1.25rem;
+          max-width: 600px;
+          margin: 0 auto;
+          position: relative;
+          animation: fadeInUp 1s ease 0.2s backwards;
+        }
+        
+        .projects-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+          gap: 2rem;
+          margin-top: 2rem;
+          position: relative;
+          z-index: 1;
+        }
+        
+        .project-card {
+          background: var(--card-color);
+          border-radius: 1rem;
+          overflow: hidden;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          transition: all 0.3s ease;
+          position: relative;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          opacity: 0;
+          transform: translateY(20px);
+          animation: fadeInUp 0.5s ease forwards;
+        }
+        
+        .project-card:nth-child(1) { animation-delay: 0.2s; }
+        .project-card:nth-child(2) { animation-delay: 0.4s; }
+        .project-card:nth-child(3) { animation-delay: 0.6s; }
+        
+        .project-card:hover {
+          transform: translateY(-10px);
+          box-shadow: 0 8px 12px -1px rgba(0, 0, 0, 0.2);
+        }
+        
+        .project-image {
+          height: 250px;
+          background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .project-image::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(45deg, rgba(0,0,0,0.2), transparent);
+        }
+        
+        .project-image::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1));
+          animation: shimmer 2s infinite;
+        }
+        
+        .project-content {
+          padding: 2rem;
+        }
+        
+        .project-content h3 {
+          color: var(--text-color);
+          margin-bottom: 1rem;
+          font-size: 1.5rem;
+        }
+        
+        .project-content p {
+          color: var(--text-color);
+          opacity: 0.8;
+          margin-bottom: 1.5rem;
+        }
+        
+        .tech-stack {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-top: 1rem;
+        }
+        
+        .tech-tag {
+          background: rgba(139, 92, 246, 0.1);
+          padding: 0.5rem 1rem;
+          border-radius: 2rem;
+          font-size: 0.875rem;
+          color: var(--primary-color);
+          border: 1px solid rgba(139, 92, 246, 0.2);
+          transition: all 0.3s ease;
+        }
+        
+        .tech-tag:hover {
+          background: var(--primary-color);
+          color: white;
+          transform: translateY(-2px);
+        }
+        
+        .achievement-badge {
+          position: absolute;
+          top: 1rem;
+          right: 1rem;
+          background: var(--accent-color);
+          color: white;
+          padding: 0.5rem 1rem;
+          border-radius: 2rem;
+          font-size: 0.75rem;
+          font-weight: 500;
+        }
+        
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        
+        .floating-particles {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 0;
+        }
+        
+        .particle {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          background: var(--primary-color);
+          border-radius: 50%;
+          opacity: 0.3;
+          animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+          0% { transform: translateY(0) translateX(0); opacity: 0; }
+          50% { transform: translateY(-100px) translateX(50px); opacity: 0.5; }
+          100% { transform: translateY(-200px) translateX(0); opacity: 0; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="portfolio">
+        <div class="floating-particles">
+          <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+          <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
+          <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
+          <div class="particle" style="left: 40%; animation-delay: 6s;"></div>
+          <div class="particle" style="left: 50%; animation-delay: 8s;"></div>
+          <div class="particle" style="left: 60%; animation-delay: 10s;"></div>
+          <div class="particle" style="left: 70%; animation-delay: 12s;"></div>
+          <div class="particle" style="left: 80%; animation-delay: 14s;"></div>
+          <div class="particle" style="left: 90%; animation-delay: 16s;"></div>
+        </div>
+        
+        <div class="header">
+          <h1>Lhackeuuuur's Portfolio</h1>
+          <span class="school-badge">1337 Coding School</span>
+        </div>
+        
+        <div class="hero">
+          <h1>Inception of Things</h1>
+          <p>Advanced Kubernetes Infrastructure & Cloud Solutions</p>
+        </div>
+        
+        <div class="projects-grid">
+          <div class="project-card">
+            <div class="project-image"></div>
+            <div class="project-content">
+              <span class="achievement-badge">Featured Project</span>
+              <h3>K3s Cluster Implementation</h3>
+              <p>Designed and deployed a highly available Kubernetes cluster using K3s, featuring automated provisioning, monitoring, and scaling capabilities.</p>
+              <div class="tech-stack">
+                <span class="tech-tag">Kubernetes</span>
+                <span class="tech-tag">K3s</span>
+                <span class="tech-tag">Docker</span>
+                <span class="tech-tag">Vagrant</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="project-card">
+            <div class="project-image"></div>
+            <div class="project-content">
+              <span class="achievement-badge">Innovation Award</span>
+              <h3>Cloud Infrastructure</h3>
+              <p>Implemented a scalable cloud infrastructure with automated deployment pipelines and monitoring solutions.</p>
+              <div class="tech-stack">
+                <span class="tech-tag">Helm</span>
+                <span class="tech-tag">Nginx</span>
+                <span class="tech-tag">Prometheus</span>
+                <span class="tech-tag">Grafana</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="project-card">
+            <div class="project-image"></div>
+            <div class="project-content">
+              <span class="achievement-badge">Best Practice</span>
+              <h3>DevOps Pipeline</h3>
+              <p>Created an end-to-end CI/CD pipeline with automated testing, deployment, and monitoring capabilities.</p>
+              <div class="tech-stack">
+                <span class="tech-tag">Jenkins</span>
+                <span class="tech-tag">GitLab CI</span>
+                <span class="tech-tag">ArgoCD</span>
+                <span class="tech-tag">ELK Stack</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html> 

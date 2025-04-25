@@ -1,0 +1,427 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app1
+  labels:
+    app: app1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app1
+  template:
+    metadata:
+      labels:
+        app: app1
+    spec:
+      containers:
+      - name: app1
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: app1-content
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: app1-content
+        configMap:
+          name: app1-content
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app1
+spec:
+  selector:
+    app: app1
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app1-content
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Lhackeuuuur | Tech Dashboard</title>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+          --primary-color: #6366f1;
+          --secondary-color: #4f46e5;
+          --accent-color: #f59e0b;
+          --background-color: #0f172a;
+          --card-color: #1e293b;
+          --text-color: #e2e8f0;
+          --success-color: #10b981;
+          --warning-color: #f59e0b;
+          --error-color: #ef4444;
+        }
+        
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        
+        body {
+          font-family: 'Space Grotesk', sans-serif;
+          background-color: var(--background-color);
+          color: var(--text-color);
+          line-height: 1.6;
+          overflow-x: hidden;
+        }
+        
+        .dashboard {
+          min-height: 100vh;
+          padding: 2rem;
+          position: relative;
+        }
+        
+        .dashboard::before {
+          content: '';
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: 
+            radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(245, 158, 11, 0.1) 0%, transparent 50%);
+          pointer-events: none;
+          z-index: 0;
+        }
+        
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 2rem;
+          padding: 1.5rem;
+          background: var(--card-color);
+          border-radius: 1rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          position: relative;
+          z-index: 1;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header h1 {
+          font-size: 2rem;
+          background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: gradientShift 5s ease infinite;
+        }
+        
+        .header-info {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+        }
+        
+        .school-badge {
+          background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+          padding: 0.5rem 1rem;
+          border-radius: 2rem;
+          font-size: 0.875rem;
+          color: white;
+        }
+        
+        .stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 1.5rem;
+          margin-bottom: 2rem;
+          position: relative;
+          z-index: 1;
+        }
+        
+        .stat-card {
+          background: var(--card-color);
+          padding: 2rem;
+          border-radius: 1rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stat-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+          transform: translateX(100%);
+          animation: shimmer 2s infinite;
+        }
+        
+        .stat-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 12px -1px rgba(0, 0, 0, 0.2);
+        }
+        
+        .stat-card h3 {
+          color: var(--text-color);
+          margin-bottom: 1rem;
+          font-size: 1.1rem;
+          opacity: 0.8;
+        }
+        
+        .stat-value {
+          font-size: 2.5rem;
+          font-weight: 700;
+          margin-bottom: 0.5rem;
+          background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+        
+        .chart-container {
+          background: var(--card-color);
+          padding: 2rem;
+          border-radius: 1rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+          margin-bottom: 2rem;
+          position: relative;
+          z-index: 1;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .chart-container h2 {
+          margin-bottom: 1.5rem;
+          color: var(--text-color);
+        }
+        
+        .chart {
+          height: 300px;
+          position: relative;
+          overflow: hidden;
+        }
+        
+        .chart-bar {
+          position: absolute;
+          bottom: 0;
+          width: 40px;
+          background: linear-gradient(to top, var(--primary-color), var(--secondary-color));
+          border-radius: 4px 4px 0 0;
+          animation: grow 1s ease-out forwards;
+          opacity: 0;
+        }
+        
+        .chart-bar:nth-child(1) { left: 20%; height: 60%; animation-delay: 0.1s; }
+        .chart-bar:nth-child(2) { left: 40%; height: 80%; animation-delay: 0.2s; }
+        .chart-bar:nth-child(3) { left: 60%; height: 40%; animation-delay: 0.3s; }
+        .chart-bar:nth-child(4) { left: 80%; height: 70%; animation-delay: 0.4s; }
+        
+        .status-indicator {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          display: inline-block;
+          margin-right: 0.5rem;
+          position: relative;
+        }
+        
+        .status-indicator::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          border-radius: 50%;
+          animation: pulse 2s infinite;
+        }
+        
+        .status-indicator.healthy::after {
+          background-color: var(--success-color);
+          box-shadow: 0 0 0 0 var(--success-color);
+        }
+        
+        .status-indicator.warning::after {
+          background-color: var(--warning-color);
+          box-shadow: 0 0 0 0 var(--warning-color);
+        }
+        
+        .status-indicator.error::after {
+          background-color: var(--error-color);
+          box-shadow: 0 0 0 0 var(--error-color);
+        }
+        
+        .project-status {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 1.5rem;
+          margin-top: 2rem;
+        }
+        
+        .project-card {
+          background: var(--card-color);
+          padding: 1.5rem;
+          border-radius: 1rem;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .project-title {
+          color: var(--accent-color);
+          margin-bottom: 0.5rem;
+        }
+        
+        .tech-stack {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-top: 1rem;
+        }
+        
+        .tech-tag {
+          background: rgba(99, 102, 241, 0.1);
+          padding: 0.5rem 1rem;
+          border-radius: 2rem;
+          font-size: 0.875rem;
+          color: var(--primary-color);
+          border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+        
+        @keyframes pulse {
+          0% { box-shadow: 0 0 0 0 currentColor; }
+          70% { box-shadow: 0 0 0 10px rgba(0, 0, 0, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); }
+        }
+        
+        @keyframes grow {
+          from { transform: scaleY(0); opacity: 0; }
+          to { transform: scaleY(1); opacity: 1; }
+        }
+        
+        @keyframes shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
+        }
+        
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        
+        .floating-particles {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: 0;
+        }
+        
+        .particle {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          background: var(--primary-color);
+          border-radius: 50%;
+          opacity: 0.3;
+          animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+          0% { transform: translateY(0) translateX(0); opacity: 0; }
+          50% { transform: translateY(-100px) translateX(50px); opacity: 0.5; }
+          100% { transform: translateY(-200px) translateX(0); opacity: 0; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="dashboard">
+        <div class="floating-particles">
+          <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+          <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
+          <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
+          <div class="particle" style="left: 40%; animation-delay: 6s;"></div>
+          <div class="particle" style="left: 50%; animation-delay: 8s;"></div>
+          <div class="particle" style="left: 60%; animation-delay: 10s;"></div>
+          <div class="particle" style="left: 70%; animation-delay: 12s;"></div>
+          <div class="particle" style="left: 80%; animation-delay: 14s;"></div>
+          <div class="particle" style="left: 90%; animation-delay: 16s;"></div>
+        </div>
+        
+        <div class="header">
+          <h1>Lhackeuuuur's Tech Dashboard</h1>
+          <div class="header-info">
+            <span class="school-badge">1337 Coding School</span>
+            <div class="status-indicator healthy"></div>
+          </div>
+        </div>
+        
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3>Cluster Health</h3>
+            <div class="stat-value">98%</div>
+            <p>All systems operational</p>
+          </div>
+          <div class="stat-card">
+            <h3>Active Nodes</h3>
+            <div class="stat-value">3</div>
+            <p>Running smoothly</p>
+          </div>
+          <div class="stat-card">
+            <h3>Response Time</h3>
+            <div class="stat-value">42ms</div>
+            <p>Optimal performance</p>
+          </div>
+          <div class="stat-card">
+            <h3>Resource Usage</h3>
+            <div class="stat-value">65%</div>
+            <p>Within optimal range</p>
+          </div>
+        </div>
+        
+        <div class="chart-container">
+          <h2>Resource Utilization</h2>
+          <div class="chart">
+            <div class="chart-bar"></div>
+            <div class="chart-bar"></div>
+            <div class="chart-bar"></div>
+            <div class="chart-bar"></div>
+          </div>
+        </div>
+        
+        <div class="project-status">
+          <div class="project-card">
+            <h3 class="project-title">Inception of Things (IoT)</h3>
+            <p>Kubernetes cluster with K3s implementation</p>
+            <div class="tech-stack">
+              <span class="tech-tag">Kubernetes</span>
+              <span class="tech-tag">K3s</span>
+              <span class="tech-tag">Docker</span>
+              <span class="tech-tag">Vagrant</span>
+            </div>
+          </div>
+          
+          <div class="project-card">
+            <h3 class="project-title">Cloud Infrastructure</h3>
+            <p>Automated deployment and scaling</p>
+            <div class="tech-stack">
+              <span class="tech-tag">Helm</span>
+              <span class="tech-tag">Nginx</span>
+              <span class="tech-tag">Prometheus</span>
+              <span class="tech-tag">Grafana</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </body>
+    </html> 
