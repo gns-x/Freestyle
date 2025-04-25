@@ -1,0 +1,46 @@
+# Vagrant related
+.vagrant/
+*.log
+Vagrantfile.local
+
+# Kubernetes related
+kubeconfig.yaml
+*.kubeconfig
+.kube/
+
+# SSH related
+confs/id_rsa
+confs/id_rsa.pub
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE related
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+
+# Log files
+*.log
+logs/
+log/
+
+# Cache directories
+.cache/
+__pycache__/
+*.py[cod]
+*$py.class 
