@@ -5,6 +5,7 @@ global:
   ingress:
     configureCertmanager: false
     class: traefik
+    enabled: false
   minio:
     enabled: false
   appConfig:
@@ -35,7 +36,36 @@ global:
     port: 8181
   kas:
     enabled: false
+  pages:
+    enabled: false
+  registry:
+    enabled: false
+  praefect:
+    enabled: false
+  spamcheck:
+    enabled: false
+  webservice:
+    extraEnv:
+      GITLAB_OMNIBUS_CONFIG: |
+        gitlab_rails['gitlab_shell_ssh_port'] = 32022
 gitlab:
+  gitaly:
+    persistence:
+      enabled: false
+    resources:
+      requests:
+        memory: 200Mi
+        cpu: 100m
+      limits:
+        memory: 400Mi
+        cpu: 200m
+    replicas: 1
+    startupProbe:
+      enabled: false
+    livenessProbe:
+      enabled: false
+    readinessProbe:
+      enabled: false
   gitlab-shell:
     service:
       type: ClusterIP
@@ -46,54 +76,94 @@ gitlab:
       port: 8181
     resources:
       requests:
-        memory: 512Mi
-        cpu: 250m
+        memory: 200Mi
+        cpu: 100m
       limits:
-        memory: 1Gi
-        cpu: 500m
+        memory: 400Mi
+        cpu: 200m
+    replicas: 1
+    startupProbe:
+      enabled: false
+    livenessProbe:
+      enabled: false
+    readinessProbe:
+      enabled: false
+    extraEnv:
+      GITLAB_OMNIBUS_CONFIG: |
+        gitlab_rails['gitlab_shell_ssh_port'] = 32022
+    init:
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: 50m
+        limits:
+          memory: 200Mi
+          cpu: 100m
   sidekiq:
     persistence:
       enabled: false
     resources:
       requests:
-        memory: 256Mi
-        cpu: 100m
+        memory: 100Mi
+        cpu: 50m
       limits:
-        memory: 512Mi
-        cpu: 250m
+        memory: 200Mi
+        cpu: 100m
+    replicas: 1
+    startupProbe:
+      enabled: false
+    livenessProbe:
+      enabled: false
+    readinessProbe:
+      enabled: false
+    init:
+      resources:
+        requests:
+          memory: 100Mi
+          cpu: 50m
+        limits:
+          memory: 200Mi
+          cpu: 100m
   toolbox:
     enabled: false
-  gitaly:
-    persistence:
-      enabled: false
-    resources:
-      requests:
-        memory: 256Mi
-        cpu: 100m
-      limits:
-        memory: 512Mi
-        cpu: 250m
 postgresql:
   persistence:
     enabled: false
   resources:
     requests:
-      memory: 256Mi
-      cpu: 100m
+      memory: 100Mi
+      cpu: 50m
     limits:
-      memory: 512Mi
-      cpu: 250m
+      memory: 200Mi
+      cpu: 100m
+  primary:
+    podAnnotations:
+      "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
+    startupProbe:
+      enabled: false
+    livenessProbe:
+      enabled: false
+    readinessProbe:
+      enabled: false
 redis:
   master:
     persistence:
       enabled: false
     resources:
       requests:
-        memory: 128Mi
-        cpu: 100m
+        memory: 100Mi
+        cpu: 50m
       limits:
-        memory: 256Mi
-        cpu: 250m
+        memory: 200Mi
+        cpu: 100m
+    podAnnotations:
+      "cluster-autoscaler.kubernetes.io/safe-to-evict": "true"
+    startupProbe:
+      enabled: false
+    livenessProbe:
+      enabled: false
+    readinessProbe:
+      enabled: false
 nginx-ingress:
   enabled: false
 certmanager:
