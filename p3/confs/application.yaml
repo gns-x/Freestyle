@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/gns-x/Freestyle
+    repoURL: https://github.com/gns-x/Freestyle.git
     targetRevision: HEAD
     path: p3/confs
   destination:

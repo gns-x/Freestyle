@@ -70,6 +70,10 @@ kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/st
 echo "Waiting for Argo CD to be ready..."
 kubectl wait --for=condition=available deployment/argocd-server -n argocd --timeout=300s
 
+# Deploy Argo CD application
+echo "Deploying Argo CD application..."
+kubectl apply -f confs/application.yaml
+
 # Get Argo CD admin password
 echo "Argo CD admin password:"
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
