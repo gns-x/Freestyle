@@ -1,6 +1,6 @@
 .PHONY: install clean test status check-docker check-cluster check-argocd check-app \
         argocd-port-forward test-app logs-k3d logs-argocd logs-app reset-cluster \
-        argocd-sync clean-cluster clean-argocd clean-app argocd-info
+        argocd-sync clean-cluster clean-argocd clean-app argocd-info setup-app
 
 # Variables
 CLUSTER_NAME := iot-cluster
@@ -14,6 +14,11 @@ install:
 	chmod +x scripts/install.sh
 	@echo "Running installation script..."
 	./scripts/install.sh
+	@echo "Deploying application..."
+	kubectl apply -f confs/deployment.yaml
+	@echo "Waiting for deployment to be ready..."
+	@kubectl wait --for=condition=available deployment/playground -n dev --timeout=120s
+	@echo "Installation completed successfully!"
 
 # Cleanup
 clean: clean-app clean-argocd clean-cluster
@@ -143,4 +148,5 @@ help:
 	@echo "  make logs-app         - Show application logs"
 	@echo "  make reset-cluster    - Reset K3d cluster"
 	@echo "  make argocd-sync      - Sync Argo CD application"
+	@echo "  make setup-app        - Setup application"
 	@echo "  make help             - Show this help message" 
