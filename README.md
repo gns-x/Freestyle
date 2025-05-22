@@ -30,7 +30,7 @@ This project consists of two main parts:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    Local Development                     │
+│                    Local Development                    │
 │                                                         │
 │  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐  │
 │  │  K3d        │    │  GitLab     │    │  Argo CD    │  │
